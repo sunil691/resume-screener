@@ -9,23 +9,9 @@ export async function listOpenJobs(): Promise<{ jobs: PublicJob[]; error: string
   try {
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase.from("jobs").select("id, title, company, description").eq("status", "open").order("created_at", { ascending: false });
-    if (error) {
-      console.error("[listOpenJobs diagnostic] Supabase query returned error:", {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
-      return { jobs: [], error: "We could not load open positions right now. Please try again soon." };
-    }
+    if (error) return { jobs: [], error: "We could not load open positions right now. Please try again soon." };
     return { jobs: data as PublicJob[], error: null };
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[listOpenJobs diagnostic] Exception in listOpenJobs:", {
-      errorMessage: message,
-      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    });
+  } catch {
     return { jobs: [], error: "We could not load open positions right now. Please try again soon." };
   }
 }
@@ -36,23 +22,9 @@ export async function getPublicJob(jobId: string): Promise<{ job: PublicJobDetai
   try {
     const supabase = createSupabaseAdminClient();
     const { data, error } = await supabase.from("jobs").select("id, title, company, description, status").eq("id", parsedId.data).maybeSingle();
-    if (error) {
-      console.error("[getPublicJob diagnostic] Supabase query returned error:", {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-      });
-      return { job: null, error: "We could not load this position right now. Please try again soon." };
-    }
+    if (error) return { job: null, error: "We could not load this position right now. Please try again soon." };
     return { job: (data as PublicJobDetail | null) ?? null, error: null };
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.error("[getPublicJob diagnostic] Exception in getPublicJob:", {
-      errorMessage: message,
-      hasSupabaseUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    });
+  } catch {
     return { job: null, error: "We could not load this position right now. Please try again soon." };
   }
 }
