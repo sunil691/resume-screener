@@ -1,0 +1,3 @@
+export const MAX_RESUME_SIZE_BYTES = 4 * 1024 * 1024;
+export const MAX_RESUME_SIZE_LABEL = "4 MB";
+export const MIN_EXTRACTED_RESUME_CHARACTERS = 40;
